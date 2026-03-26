@@ -1,0 +1,45 @@
+{
+	"geode": "5.4.1",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"id": "arram.over-there",
+	"name": "Over There",
+	"version": "v1.0.0-beta.3",
+	"developer": "Arram",
+	"description": "The loot is over there",
+	"tags": [
+		"cheat",
+		"enhancement",
+		"gameplay",
+		"offline",
+		"utility"
+	],
+	"settings": {
+		"ot-title":{
+			"type": "title",
+			"name": "Over There Settings"
+		},
+		"toggle-pointers": {
+			"type": "bool",
+			"name": "Toggle Pointers",
+			"default": true
+		},
+		"pointer-limit": {
+			"type": "int",
+			"name": "Maximum Pointer Count",
+			"default": 15,
+			"description": "Some spam levels use pickup objects in an attempt to lag the game (and it works). This limit will help prevent excessive entity creation. Some levels have quite a few keys, so I've made the maximum limit fairly high, while still allowing for a custom threshold. Hopefully this will be useful for those with weaker devices.",
+			"min": 6,
+			"max": 30
+		}
+	},
+	"resources": {
+		"sprites": [
+			"resources/*.png"
+		]
+	}
+}
