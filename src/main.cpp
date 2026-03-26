@@ -84,6 +84,12 @@ class $modify(OTPlayLayer, PlayLayer) {
 	void resetLevel() {
 		PlayLayer::resetLevel();
 		cleanOverThere();
+		if (!Mod::get()->getSettingValue<bool>("toggle-pointers")) {
+			if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
+				this->m_objectParent->removeChild(lootNode, 1);
+			}
+			return;
+		}
 		setupOverThere();
 	} // yeah (prettiest function in the whole mod)
 
@@ -113,6 +119,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 	void updateEntityPosition(CCSprite* entity, GameObject* target) {
 		// wall of stuff (with stuff that may be relevant to players explained, that is, stuff that could potentially be a setting)
 		auto arrow = static_cast<CCSprite*>(entity->getChildByID("arrow"));
+		auto cross = static_cast<CCSprite*>(entity->getChildByID("cross"));
 		float cameraZoom = GJBaseGameLayer::get()->m_gameState.m_cameraZoom;
 		CCPoint cameraOffset = GJBaseGameLayer::get()->m_gameState.m_cameraOffset;
 		auto winSize = CCDirector::sharedDirector()->getWinSize();
@@ -159,7 +166,8 @@ class $modify(OTPlayLayer, PlayLayer) {
 		if (onScreen) {
 			entity->setOpacity(0);
 			arrow->setOpacity(0);
-		} // hide entity if collectible is on screen
+			cross->setOpacity(255);
+		} // hide entity if collectible is on screen and show cross
 		else {
 			float alpha = 255.f;
 			if (distanceSq > minDistanceSq) {
@@ -179,7 +187,8 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 		if (!onScreen) {
 			updateArrowRotation(entity, target);
-		} // update arrows if target is offscreen
+			cross->setOpacity(0);
+		} // update arrows if target is offscreen and hide cross
 	} // place entity on screen
 
 
@@ -208,6 +217,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 
 	void setupOverThere() {
+		if (!Mod::get()->getSettingValue<bool>("toggle-pointers")) return;
 		if (!this->m_objectParent->getChildByID("over-there-node")) {
 			auto mainNode = this->m_objectParent;
 			auto lootNode = CCNode::create();
@@ -235,11 +245,12 @@ class $modify(OTPlayLayer, PlayLayer) {
 		otEntity->setID("over-there-entity");
 		lootNode->addChild(otEntity);
 		m_fields->OTEntities[otEntity] = target;
-		createArrowInstance(otEntity, target);
+		createArrowInstance(otEntity);
+		createCrossInstance(otEntity);
 	} // create entity for the targeted collectible and add it to the map
 
 
-	void createArrowInstance(CCSprite* entity, GameObject* target) {
+	void createArrowInstance(CCSprite* entity) {
 		auto arrow = CCSprite::createWithTexture(CCTextureCache::sharedTextureCache()->addImage("arrowRed_001.png"_spr, 0));
 		arrow->setScale(0.5f);
 		arrow->setAnchorPoint({0.4f, 0.5f}); // rectangle? more like dihhhh
@@ -247,4 +258,15 @@ class $modify(OTPlayLayer, PlayLayer) {
 		entity->addChild(arrow);
 		arrow->ignoreAnchorPointForPosition(true);
 	} // create arrow child for entity to point with
+
+	void createCrossInstance(CCSprite* entity) {
+		auto cross = CCSprite::createWithTexture(CCTextureCache::sharedTextureCache()->addImage("crossRed_001.png"_spr, 0));
+		cross->setScale(0.7f);
+		cross->setAnchorPoint({0.5f, 0.5f});
+		cross->setContentSize({50.f, 50.f});
+		cross->refreshTextureRect(); // bruh x2
+		cross->setID("cross");
+		entity->addChild(cross);
+		cross->ignoreAnchorPointForPosition(true);
+	} // create X for marking loot position
 };
