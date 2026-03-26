@@ -64,8 +64,8 @@ class $modify(OTPlayLayer, PlayLayer) {
 	void onQuit() {
 		PlayLayer::onQuit();
 		cleanOverThere();
-		if (auto lootNode = this->getChildByID("main-node")->getChildByID("over-there-node")) {
-			this->getChildByID("main-node")->removeChild(lootNode, 1);
+		if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
+			this->m_objectParent->removeChild(lootNode, 1);
 		}
 	} // hopefully no memory incontinence
 
@@ -99,7 +99,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 			auto target = pair->second;
 			if (target->m_isDisabled) {
 				entity->removeAllChildren();
-				auto lootNode = this->getChildByID("main-node")->getChildByID("over-there-node");
+				auto lootNode = this->m_objectParent->getChildByID("over-there-node");
 				lootNode->removeChild(entity, 1);
 				pair = m_fields->OTEntities.erase(pair);
 				continue;
@@ -200,7 +200,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 
 	void cleanOverThere() {
-		if (auto lootNode = this->getChildByID("main-node")->getChildByID("over-there-node")) {
+		if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
 			lootNode->removeAllChildren();
 		}
 		m_fields->OTEntities.clear();
@@ -208,8 +208,8 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 
 	void setupOverThere() {
-		if (!this->getChildByID("main-node")->getChildByID("over-there-node")) {
-			auto mainNode = this->getChildByID("main-node");
+		if (!this->m_objectParent->getChildByID("over-there-node")) {
+			auto mainNode = this->m_objectParent;
 			auto lootNode = CCNode::create();
 			lootNode->setID("over-there-node");
 			mainNode->addChild(lootNode, 51);
@@ -225,7 +225,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 	void createOverThereEntity(GameObject* target) {
 		if (target->m_isDisabled) return;
 		if (m_fields->OTEntities.size() == Mod::get()->getSettingValue<int>("pointer-limit")) return;
-		auto lootNode = this->getChildByID("main-node")->getChildByID("over-there-node");
+		auto lootNode = this->m_objectParent->getChildByID("over-there-node");
 		auto otEntity = CCSprite::createWithTexture(target->getTexture(), target->getTextureRect());
 		otEntity->m_bRectRotated = target->isTextureRectRotated();
 		otEntity->setScale(0.6f);

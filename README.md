@@ -1,10 +1,12 @@
 # Source Code for Over There
 
-This mod creates guides along the edges of your screen that point to collectible items in levels. I created this mod purely out of spite for the coin placement habits of these new creators. Thank me later...
+This mod creates guides along the edges of your screen that point to collectible items in levels. I created this mod purely out of spite for the coin placement habits of these new creators. 
+
+Thank me later...
 
 ## What This Mod Adds
 
-Each collectible in a level will be given an "entity". This entity contains an image of the collectible as well as an arrow that will point in the direction of that collectible. The mod logo shows how this will look.
+Each collectible in a level will be given an "entity". This entity contains an image of the collectible as well as an arrow that will point in the direction of that collectible.
 
 ## How Entities Work
 
