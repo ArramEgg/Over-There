@@ -1,271 +1,43 @@
 {
-	"geode": "5.3.0",
+	"geode": "5.4.1",
 	"gd": {
 		"win": "2.2081",
 		"android": "2.2081",
 		"mac": "2.2081",
 		"ios": "2.2081"
 	},
-	"id": "arram.fancy-player",
-	"name": "Fancy Player",
-	"version": "v1.3.0-alpha.1",
+	"id": "arram.over-there",
+	"name": "Over There",
+	"version": "v1.0.0-beta.3",
 	"developer": "Arram",
-	"description": "Now you can be extra",
+	"description": "The loot is over there",
 	"links": {
-		"source": "https://github.com/ArramEgg/Fancy-Player"
+		"source": "https://github.com/ArramEgg/Over-There"
 	},
 	"tags": [
-		"customization",
+		"cheat",
 		"enhancement",
 		"gameplay",
-		"offline"
+		"offline",
+		"utility"
 	],
 	"settings": {
-		"p1-title": {
+		"ot-title":{
 			"type": "title",
-			"name": "Player 1 Settings"
+			"name": "Over There Settings"
 		},
-		"p1-particles-title": {
-			"type": "title",
-			"name": "Configure Color of Player 1 Particles"
-		},
-		"p1-change-particles": {
-			"name": "Override Built-in Particle Colors",
+		"toggle-pointers": {
 			"type": "bool",
+			"name": "Toggle Pointers",
 			"default": true
 		},
-		"p1-rainbow-particles": {
-			"name": "Rainbow Particles (Overrides startColor/finishColor)",
-			"type": "bool",
-			"enable-if": "p1-change-particles",
-			"default": false
-		},
-		"p1-start-color": {
-			"type": "rgba",
-			"name": "Particles startColor",
-			"enable-if": "p1-change-particles",
-			"default": [61, 69, 255, 255]
-		},
-		"p1-finish-color": {
-			"type": "rgba",
-			"name": "Particles finishColor",
-			"enable-if": "p1-change-particles",
-			"default": [115, 122, 255, 255]
-		},
-		"p1-dash-fire-title": {
-			"type": "title",
-			"name": "Configure Color of Player 1 Dash Fire"
-		},
-		"p1-change-dash-fire": {
-			"name": "Override Built-in Dash Fire Colors",
-			"type": "bool",
-			"default": true
-		},
-		"p1-rainbow-dash-fire": {
-			"name": "Rainbow Dash Fire (Overrides Color)",
-			"type": "bool",
-			"enable-if": "p1-change-dash-fire",
-			"default": false
-		},
-		"p1-dash-fire-color": {
-			"name": "Dash Fire Color",
-			"type": "rgb",
-			"enable-if": "p1-change-dash-fire",
-			"default": [0, 0, 255]
-		},
-		"p1-spider-dash-title": {
-			"type": "title",
-			"name": "Configure Color of Player 1 Spider Dash Effect"
-		},
-		"p1-change-spider-dash": {
-			"name": "Override Built-in Spider Dash Colors",
-			"type": "bool",
-			"default": true
-		},
-		"p1-rainbow-spider-dash": {
-			"name": "Rainbow Spider Dash (Overrides Color)",
-			"type": "bool",
-			"enable-if": "p1-change-spider-dash",
-			"default": false
-		},
-		"p1-spider-dash-color": {
-			"name": "Spider Dash Color",
-			"type": "rgb",
-			"enable-if": "p1-change-spider-dash",
-			"default": [0, 0, 255]
-		},
-		"p2-title": {
-			"type": "title",
-			"name": "Player 2 Settings"
-		},
-		"p2-enable": {
-			"name": "Enable Player 2 Customization",
-			"type": "bool",
-			"description": "When enabled, player 2 can be customized independently from player 1. Player 2 will use the same settings as player 1 when this setting is disabled.",
-			"default": false
-		},
-		"p2-particles-title": {
-			"type": "title",
-			"name": "Configure Color of Player 2 Particles"
-		},
-		"p2-change-particles": {
-			"name": "Override Built-in Particle Colors",
-			"type": "bool",
-			"enable-if": "p2-enable",
-			"default": true
-		},
-		"p2-rainbow-particles": {
-			"name": "Rainbow Particles (Overrides startColor/finishColor)",
-			"type": "bool",
-			"enable-if": "p2-change-particles && p2-enable",
-			"default": false
-		},
-		"p2-start-color": {
-			"type": "rgba",
-			"name": "Particles startColor",
-			"enable-if": "p2-change-particles && p2-enable",
-			"default": [255, 255, 0, 255]
-		},
-		"p2-finish-color": {
-			"type": "rgba",
-			"name": "Particles finishColor",
-			"enable-if": "p2-change-particles && p2-enable",
-			"default": [255, 255, 40, 255]
-		},
-		"p2-dash-fire-title": {
-			"type": "title",
-			"name": "Configure Color of Player 2 Dash Fire"
-		},
-		"p2-change-dash-fire": {
-			"name": "Override Built-in Dash Fire Colors",
-			"type": "bool",
-			"enable-if": "p2-enable",
-			"default": true
-		},
-		"p2-rainbow-dash-fire": {
-			"name": "Rainbow Dash Fire (Overrides Color)",
-			"type": "bool",
-			"enable-if": "p2-change-dash-fire && p2-enable",
-			"default": false
-		},
-		"p2-dash-fire-color": {
-			"name": "Dash Fire Color",
-			"type": "rgb",
-			"enable-if": "p2-change-dash-fire && p2-enable",
-			"default": [255, 255, 0]
-		},
-		"p2-spider-dash-title": {
-			"type": "title",
-			"name": "Configure Color of Player 2 Spider Dash Effect"
-		},
-		"p2-change-spider-dash": {
-			"name": "Override Built-in Spider Dash Colors",
-			"type": "bool",
-			"enable-if": "p2-enable",
-			"default": true
-		},
-		"p2-rainbow-spider-dash": {
-			"name": "Rainbow Spider Dash (Overrides Color)",
-			"type": "bool",
-			"enable-if": "p2-change-spider-dash && p2-enable",
-			"default": false
-		},
-		"p2-spider-dash-color": {
-			"name": "Spider Dash Color",
-			"type": "rgb",
-			"enable-if": "p2-change-spider-dash && p2-enable",
-			"default": [255, 255, 0]
-		},
-		"global-title": {
-			"type": "title",
-			"name": "Global Settings"
-		},
-		"rgb-title": {
-			"type": "title",
-			"name": "RGB Options"
-		},
-		"rgb-speed": {
-			"name": "RGB Fade Speed",
-			"type": "float",
-			"default": 0.2,
-			"min": 0.1,
-			"max": 1,
-			"control": {
-				"slider": true
-			}
-		},
-		"misc-title": {
-			"type": "title",
-			"name": "Miscellaneous Options"
-		},
-		"change-radius": {
-			"name": "Scale Radius Emitters (Type 1) Based on Player Size",
-			"type": "bool",
-			"default": false
-		},
-		"add-button": {
-			"name": "Add Settings Button to Garage (Quicker Settings Access)",
-			"type": "bool",
-			"default": true
-		},
-		"align-particles": {
-			"name": "Align Particles to Player",
-			"type": "bool",
-			"default": false,
-			"description": "Vertically aligns particles to the player (May be useful for those using radius emitters)."
-		},
-		"align-select": {
-			"name": "Only Ship/UFO",
-			"type": "bool",
-			"default": true,
-			"enable-if": "align-particles"
-		},
-		"custom-streak": {
-			"name": "Enable Nyan Cat Streak",
-			"type": "bool",
-			"default": false
-		},
-		"new-title": {
-			"type": "title",
-			"name": "Mod Update Previews",
-			"description": "These settings are taken from upcoming updates as previews."
-		},
-		"streak-enable": {
-			"name": "Enable Streak Customization",
-			"type": "bool",
-			"default": false
-		},
-		"streak-fade": {
-			"name": "Streak Time",
-			"type": "float",
-			"default": 0.5,
-			"enable-if": "streak-enable",
-			"min": 0.1,
-			"max": 2
-		},
-		"streak-repeat": {
-			"name": "Streak Image Repeat",
-			"type": "float",
-			"default": 0,
-			"description": "Adjusts the amount of image repetition in the streak. If you want a clear picture of what this does, equip the fire trail (streak).",
-			"enable-if": "streak-enable",
-			"min": 0,
-			"max": 1
-		},
-		"streak-stroke": {
-			"name": "Streak Width",
-			"type": "float",
-			"default": 26,
-			"description": "Adjusts the width of the trail (streak). Yes, now you can have humongous trails if you want. For now, the maximum value is 30 (edges of the icon).",
-			"enable-if": "streak-enable",
-			"min": 1,
+		"pointer-limit": {
+			"type": "int",
+			"name": "Maximum Pointer Count",
+			"default": 15,
+			"description": "Some spam levels use pickup objects in an attempt to lag the game (and it works). This limit will help prevent excessive entity creation. Some levels have quite a few keys, so I've made the maximum limit fairly high, while still allowing for a custom threshold. Hopefully this will be useful for those with weaker devices.",
+			"min": 6,
 			"max": 30
-		},
-		"streak-blend": {
-			"name": "Disable Additive Blending",
-			"type": "bool",
-			"default": false,
-			"enable-if": "streak-enable"
 		}
 	},
 	"resources": {
