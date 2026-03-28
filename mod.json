@@ -21,6 +21,9 @@
 		"offline",
 		"utility"
 	],
+	"dependencies": {
+		"geode.node-ids": ">=v1.22.0"
+	},
 	"settings": {
 		"ot-title":{
 			"type": "title",
