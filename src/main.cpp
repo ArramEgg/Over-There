@@ -117,7 +117,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 
 	void updateEntityPosition(CCSprite* entity, GameObject* target) {
-		// wall of stuff (with stuff that may be relevant to players explained, that is, stuff that could potentially be a setting)
+		// wall of stuff
 		auto arrow = static_cast<CCSprite*>(entity->getChildByID("arrow"));
 		auto cross = static_cast<CCSprite*>(entity->getChildByID("cross"));
 		float cameraZoom = GJBaseGameLayer::get()->m_gameState.m_cameraZoom;
@@ -125,17 +125,21 @@ class $modify(OTPlayLayer, PlayLayer) {
 		auto winSize = CCDirector::sharedDirector()->getWinSize();
 		auto lootPos = target->getLastPosition();
 		CCPoint cam = GJBaseGameLayer::get()->m_gameState.m_cameraPosition;
-		CCPoint screenPos = ccp((lootPos.x - cam.x) * cameraZoom + cameraOffset.x, (lootPos.y - cam.y) * cameraZoom + cameraOffset.y);
+		float cameraFlip = GJBaseGameLayer::get()->m_cameraFlip;
+		CCPoint screenPos = ccp((lootPos.x - cam.x) * cameraZoom * cameraFlip + cameraOffset.x, (lootPos.y - cam.y) * cameraZoom + cameraOffset.y);
 		float distanceSq;
-		float onScreenMargin = 10.f; // distance to screen edge to consider collectible on screen
+		float onScreenMargin = 20.f;
 		CCPoint distance = ccpSub(cam, lootPos);
-		float minDistance = 1000.f; // distance from player (opaque)
-		float maxDistance = 2000.f; // distance from player (transparent)
+		float minDistance = 1000.f;
+		float maxDistance = 2000.f;
 		float minDistanceSq = minDistance * minDistance;
 		float maxDistanceSq = maxDistance * maxDistance;
 		bool platformer = GJBaseGameLayer::get()->m_isPlatformer;
 		bool dualMode = UILayer::get()->m_dualMode;
 
+		if (cameraFlip < 0) {
+			screenPos.x = screenPos.x + winSize.width;
+		}
 
 		// if in platformer mode, calculate distance of closest player instead of camera
 		if (platformer) {
@@ -198,10 +202,18 @@ class $modify(OTPlayLayer, PlayLayer) {
 		CCPoint cam = GJBaseGameLayer::get()->m_gameState.m_cameraPosition;
 		float cameraZoom = GJBaseGameLayer::get()->m_gameState.m_cameraZoom;
 		CCPoint cameraOffset = GJBaseGameLayer::get()->m_gameState.m_cameraOffset;
-		CCPoint screenPos = ccp((lootPos.x - cam.x) * cameraZoom + cameraOffset.x, (lootPos.y - cam.y) * cameraZoom + cameraOffset.y);
+		float cameraFlip = GJBaseGameLayer::get()->m_cameraFlip;
+		CCPoint screenPos = ccp((lootPos.x - cam.x) * cameraZoom * cameraFlip + cameraOffset.x, (lootPos.y - cam.y) * cameraZoom + cameraOffset.y);
+		auto winSize = CCDirector::sharedDirector()->getWinSize();
+
+		if (cameraFlip < 0) {
+			screenPos.x = screenPos.x + winSize.width;
+		}
+
 		CCPoint lootDirection = ccpSub(screenPos, entity->getPosition());
 		lootDirection.y *= -1; // son im crine
 		float angle = ccpToAngle(lootDirection);
+		
 		arrow->setRotation(CC_RADIANS_TO_DEGREES(angle));
 		arrow->setPosition({std::cos(angle) * 40.f, std::sin(-angle) * 40.f});
 		return;
