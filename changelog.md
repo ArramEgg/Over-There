@@ -1,3 +1,6 @@
+# 1.0.3
+- Added option to only toggle pointers when in practice mode
+
 # 1.0.2
 - Adjusted some entity math (looks nicer)
 - I forgot to account for mirror portals so those work now

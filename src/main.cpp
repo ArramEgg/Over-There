@@ -9,20 +9,29 @@ class $modify(OTPauseLayer, PauseLayer) {
 	void customSetup() {
 		this->PauseLayer::customSetup();
 
-		// create item node (this is for the label)
-		auto otItem = CCNode::create();
-		otItem->setContentSize({50.f, 26.f});
+		// create nodes for labels
+		auto otItem1 = CCNode::create();
+		otItem1->setContentSize({50.f, 26.f});
+		auto otItem2 = CCNode::create();
+		otItem2->setContentSize({50.f, 40.f});
 
-		// create toggle box
+		// create toggle box 1 
 		auto offSpr = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
 		auto onSpr = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
-		auto otToggle = CCMenuItemToggler::create(offSpr, onSpr, this, menu_selector(OTPauseLayer::toggleOT));
-		otToggle->setAnchorPoint({0.5f, 0.5f});
-		otToggle->setID("over-there-toggle");
+		auto otToggle1 = CCMenuItemToggler::create(offSpr, onSpr, this, menu_selector(OTPauseLayer::toggleOT));
+		otToggle1->setAnchorPoint({0.5f, 0.5f});
+		otToggle1->setID("over-there-toggle");
 
-		// apply setting value to toggle box
+		// create toggle box 2
+		auto otToggle2 = CCMenuItemToggler::create(offSpr, onSpr, this, menu_selector(OTPauseLayer::togglePracticeOT));
+		otToggle2->setAnchorPoint({0.5f, 0.5f});
+		otToggle2->setID("over-there-toggle2");
+
+		// apply setting values to toggle boxes
 		bool togglePointers = Mod::get()->getSettingValue<bool>("toggle-pointers");
-		otToggle->toggle(togglePointers ? 1 : 0);
+		otToggle1->toggle(togglePointers ? 1 : 0);
+		bool practicePointers = Mod::get()->getSettingValue<bool>("practice-pointers");
+		otToggle2->toggle(practicePointers ? 1 : 0);
 		
 		// create toggle box label
 		auto otLabel = CCLabelBMFont::create("Toggle\nPointers", "bigFont.fnt", 0.f, kCCTextAlignmentCenter);
@@ -30,22 +39,39 @@ class $modify(OTPauseLayer, PauseLayer) {
 		otLabel->setScale(0.3f);
 		otLabel->setID("over-there-label");
 
-		// add label to its node (if i don't do this, weird stuff happens idk... menu don't like labels ig)
-		otItem->addChild(otLabel);
+		// create practice mode label
+		auto otPracticeLabel = CCLabelBMFont::create("Pointers\nOnly In\nPractice", "bigFont.fnt", 0.f, kCCTextAlignmentCenter);
+		otPracticeLabel->setPosition({25.f, 20.f});
+		otPracticeLabel->setScale(0.3f);
+		otPracticeLabel->setID("over-there-practice-label");
+
+		// add labels to their nodes
+		otItem1->addChild(otLabel);
+		otItem2->addChild(otPracticeLabel);
 		
 		if (auto menu = this->getChildByID("right-button-menu")) {
-			menu->addChild(otToggle);
-			menu->addChild(otItem);
+			menu->addChild(otToggle2);
+			menu->addChild(otItem2);
+			menu->addChild(otToggle1);
+			menu->addChild(otItem1);
 			menu->updateLayout();
 		} // obligatory comment
-	} // hook customSetup to create stuff
-	// callback function
+	} // epic comment
+
+	// callback functions
 	void toggleOT(CCObject* sender) {
 		auto toggle = static_cast<CCMenuItemToggler*>(sender);
 		bool state = !toggle->isToggled();
 		Mod::get()->setSettingValue<bool>("toggle-pointers", state);
 		return;
-	} // make toggle box do stuff
+	} // toggle function
+
+	void togglePracticeOT(CCObject* sender) {
+		auto toggle = static_cast<CCMenuItemToggler*>(sender);
+		bool state = !toggle->isToggled();
+		Mod::get()->setSettingValue<bool>("practice-pointers", state);
+		return;
+	} // practice function
 }; // UI creation is butt-ugly
 
 
@@ -84,6 +110,10 @@ class $modify(OTPlayLayer, PlayLayer) {
 	void resetLevel() {
 		PlayLayer::resetLevel();
 		cleanOverThere();
+		bool isPracticeMode = GJBaseGameLayer::get()->m_isPracticeMode;
+		if (Mod::get()->getSettingValue<bool>("practice-pointers") && !isPracticeMode) {
+			return;
+		}
 		if (!Mod::get()->getSettingValue<bool>("toggle-pointers")) {
 			if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
 				this->m_objectParent->removeChild(lootNode, 1);
@@ -229,7 +259,6 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 
 	void setupOverThere() {
-		if (!Mod::get()->getSettingValue<bool>("toggle-pointers")) return;
 		if (!this->m_objectParent->getChildByID("over-there-node")) {
 			auto mainNode = this->m_objectParent;
 			auto lootNode = CCNode::create();

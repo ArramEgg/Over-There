@@ -8,7 +8,7 @@
 	},
 	"id": "arram.over-there",
 	"name": "Over There",
-	"version": "v1.0.2",
+	"version": "v1.0.3",
 	"developer": "Arram",
 	"description": "The loot is over there",
 	"links": {
@@ -28,6 +28,11 @@
 		"ot-title":{
 			"type": "title",
 			"name": "Over There Settings"
+		},
+		"practice-pointers": {
+			"type": "bool",
+			"name": "Toggle Pointers Only in Practice Mode",
+			"default": false
 		},
 		"toggle-pointers": {
 			"type": "bool",

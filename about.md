@@ -13,4 +13,5 @@ Each collectible in a level will be given an "entity". This entity contains an i
 The entities are initially transparent. As you move closer to a collectible, the entity will become opaque. Once a collectible is visible on-screen, the entity will vanish and the collectible will be marked with a red <cr>X</c> (useful for invisible things). The entity will reappear if the collectible moves off-screen uncollected. As you move further from a collectible, the entity will become transparent again.
 
 ## <cr>Miscellaneous Features</c>
+* Option to only toggle pointers when in practice mode
 * Option to set maximum entity count in mod settings (spam level protection)
