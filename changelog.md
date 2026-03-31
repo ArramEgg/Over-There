@@ -1,3 +1,7 @@
+# 1.0.4
+- Added settings button to pause menu to reduce clutter
+- Fixed incorrect camera-offset calculation
+
 # 1.0.3
 - Added option to only toggle pointers when in practice mode
 
