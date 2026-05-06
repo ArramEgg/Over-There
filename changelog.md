@@ -1,3 +1,6 @@
+# 1.0.5
+- Updated title to make the mod easier to find...
+
 # 1.0.4
 - Added settings button to pause menu to reduce clutter
 - Fixed incorrect camera-offset calculation
