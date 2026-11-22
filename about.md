@@ -6,12 +6,13 @@ Thank me later...
 
 ## <cr>What This Mod Adds</c>
 
-Each collectible in a level will be given an "entity". This entity contains an image of the collectible as well as an arrow that will point in the direction of that collectible.
+Each collectible in a level will be given a guide. This guide contains an image of the collectible as well as an arrow that will point in the direction of that collectible.
 
-## <cr>How Entities Work</c>
+## <cr>How Guides Work</c>
 
-The entities are initially transparent. As you move closer to a collectible, the entity will become opaque. Once a collectible is visible on-screen, the entity will vanish and the collectible will be marked with a red <cr>X</c> (useful for invisible things). The entity will reappear if the collectible moves off-screen uncollected. As you move further from a collectible, the entity will become transparent again.
+The guides are initially transparent. As you move closer to a collectible, the guide will become opaque. Once a collectible is visible on-screen, the guide will vanish and the collectible will be marked with a red <cr>X</c> (useful for invisible things). The guide will reappear if the collectible moves off-screen uncollected. As you move further from a collectible, the guide will become transparent again.
 
 ## <cr>Miscellaneous Features</c>
-* Option to only toggle pointers when in practice mode
-* Option to set maximum entity count in mod settings (spam level protection)
+* Option to only toggle guides when in practice mode
+* Option to set maximum guide count (spam level protection)
+* Customizable settings popup theme because why not

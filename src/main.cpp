@@ -1,121 +1,57 @@
 #include <Geode/Geode.hpp>
-#include <Geode/binding/CCMenuItemToggler.hpp>
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include "Settings.hpp"
+#include "SettingsMenu.hpp"
 
 using namespace geode::prelude;
 
-class OverTherePopup : public Popup {
-protected:
-	bool init() {
-		if (!Popup::init(210.f, 120.f)) return false;
-		this->setTitle("Over There Options");
-		this->setID("over-there-popup");
-
-		auto menu = CCMenu::create();
-		menu->setPosition({0.f, 0.f});
-		menu->setID("over-there-menu");
-		m_mainLayer->addChild(menu);
-
-		// create toggle box 1 
-		auto offSpr = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
-		auto onSpr = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
-		auto otToggle1 = CCMenuItemToggler::create(offSpr, onSpr, this, menu_selector(OverTherePopup::toggleOT));
-		otToggle1->setAnchorPoint({0.5f, 0.5f});
-		otToggle1->setPosition({140.f, 68.f});
-		otToggle1->setID("over-there-toggle1");
-		menu->addChild(otToggle1);
-
-		// create toggle box 2
-		auto otToggle2 = CCMenuItemToggler::create(offSpr, onSpr, this, menu_selector(OverTherePopup::togglePracticeOT));
-		otToggle2->setAnchorPoint({0.5f, 0.5f});
-		otToggle2->setPosition({70.f, 68.f});
-		otToggle2->setID("over-there-toggle2");
-		menu->addChild(otToggle2);
-
-		// apply setting values to toggle boxes
-		bool togglePointers = Mod::get()->getSettingValue<bool>("toggle-pointers");
-		otToggle1->toggle(togglePointers ? 1 : 0);
-		bool practicePointers = Mod::get()->getSettingValue<bool>("practice-pointers");
-		otToggle2->toggle(practicePointers ? 1 : 0);
-
-		
-		// create toggle box label
-		auto otLabel = CCLabelBMFont::create("Toggle\nPointers", "bigFont.fnt", 0.f, kCCTextAlignmentCenter);
-		otLabel->setPosition({140.f, 35.f});
-		otLabel->setScale(0.3f);
-		otLabel->setID("over-there-label");
-		menu->addChild(otLabel);
-
-		// create practice mode label
-		auto otPracticeLabel = CCLabelBMFont::create("Pointers\nOnly In\nPractice", "bigFont.fnt", 0.f, kCCTextAlignmentCenter);
-		otPracticeLabel->setPosition({70.f, 30.f});
-		otPracticeLabel->setScale(0.3f);
-		otPracticeLabel->setID("over-there-practice-label");
-		menu->addChild(otPracticeLabel);
-
-		return true;
-	} // init
-
-	// callback functions
-
-	void toggleOT(CCObject* sender) {
-		auto toggle = static_cast<CCMenuItemToggler*>(sender);
-		bool state = !toggle->isToggled();
-		Mod::get()->setSettingValue<bool>("toggle-pointers", state);
-		return;
-	} // toggle function
-
-
-	void togglePracticeOT(CCObject* sender) {
-		auto toggle = static_cast<CCMenuItemToggler*>(sender);
-		bool state = !toggle->isToggled();
-		Mod::get()->setSettingValue<bool>("practice-pointers", state);
-		return;
-	} // practice function
-public:
-	static OverTherePopup* create() {
-		auto ret = new OverTherePopup();
-		if (ret && ret->init()) {
-			ret->autorelease();
-			return ret;
-		}
-		delete ret;
-		return nullptr;
-	} // create
-};
+namespace overthere
+{
+	Settings settings;
+}
 
 
 class $modify(OTPauseLayer, PauseLayer) {
 	void customSetup() {
 		this->PauseLayer::customSetup();
-
-		// create button
 		auto spr = CCSprite::create("OT_logoBtn_001.png"_spr);
-		spr->setScale(0.65f);
+		spr->setScale(0.575f);
 		auto btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(OTPauseLayer::onLogoBtn));
 		btn->setAnchorPoint({0.5f, 0.5f});
 		btn->setID("over-there-button");
-		
-		// add button
-		if (auto menu = this->getChildByID("right-button-menu")) {
+		if (auto menu = this->getChildByIDRecursive("right-button-menu")) {
 			menu->addChild(btn);
 			menu->updateLayout();
 		}
-	} // custom setup
+	}
 
-	// callback functions
+	void onEdit(CCObject* sender) {
+		PauseLayer::onEdit(sender);
+		auto playLayer = GameManager::sharedState()->getPlayLayer();
+		if (auto lootNode = playLayer->m_objectParent->getChildByID("over-there-node")) {
+			lootNode->removeAllChildren();
+			playLayer->m_objectParent->removeChild(lootNode, 1);
+		}
+	}
 
 	void onLogoBtn(CCObject *) {
 		OverTherePopup::create()->show();
-	} // comment
+	}
 };
 
 
 class $modify(OTPlayLayer, PlayLayer) {
 	struct Fields
 	{
+		Fields() {
+			log::info("Created OTEntities");
+		}
 		std::unordered_map<CCSprite*, GameObject*> OTEntities;
+		bool isInPractice;
+		~Fields() {
+			log::info("Removed OTEntities");
+		}
 	};
 
 
@@ -123,48 +59,69 @@ class $modify(OTPlayLayer, PlayLayer) {
 	Hooked Functions
 	--------------*/
 
+	
+	bool init(GJGameLevel* level, bool dontCreateObjects) {
+		if (!PlayLayer::init(level, dontCreateObjects)) return false;
+		m_fields.self();
+		m_fields->isInPractice = GJBaseGameLayer::get()->m_isPracticeMode;
+		log::info("Fields registered!");
+		return true;
+	}
 
 	void onQuit() {
 		PlayLayer::onQuit();
 		cleanOverThere();
 		if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
 			this->m_objectParent->removeChild(lootNode, 1);
+			log::info("Cleaning 3/3: Removed Over There CCNode!");
 		}
 	} // hopefully no memory incontinence
 
-
 	void postUpdate(float dt) {
 		PlayLayer::postUpdate(dt);
-		bool togglePointers = Mod::get()->getSettingValue<bool>("toggle-pointers");
+		bool togglePointers = overthere::settings.togglePointers;
 		if (!togglePointers) return;
+		checkForPracticeEntry();
 		if (m_fields->OTEntities.empty()) {
 			return;
 		}
 		updateOT();
-	} // update stuff per frame here
-
+	}
 
 	void resetLevel() {
 		PlayLayer::resetLevel();
 		cleanOverThere();
 		bool isPracticeMode = GJBaseGameLayer::get()->m_isPracticeMode;
-		if (Mod::get()->getSettingValue<bool>("practice-pointers") && !isPracticeMode) {
+		//bool isPracticeMode = reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(GJBaseGameLayer::get()) + 0x748); // GJBGL members are still CLAPPED
+		if (overthere::settings.practiceOnly && !isPracticeMode) {
+			log::info("Practice only enabled! Ignoring loot...");
 			return;
 		}
-		if (!Mod::get()->getSettingValue<bool>("toggle-pointers")) {
+		if (!overthere::settings.togglePointers) {
 			if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
 				this->m_objectParent->removeChild(lootNode, 1);
+				log::info("Pointers disabled! Deleting node...");
 			}
 			return;
 		}
 		setupOverThere();
-	} // yeah (prettiest function in the whole mod)
+	}
 
 
 	/*--------------
 	Custom Functions
 	--------------*/
 
+
+	void checkForPracticeEntry() {
+		bool isPracticeMode = GJBaseGameLayer::get()->m_isPracticeMode;
+		if (isPracticeMode != m_fields->isInPractice) {
+			if (isPracticeMode) {
+				m_fields->isInPractice = isPracticeMode;
+				setupOverThere();
+			}
+		}
+	} // prevents needing to restart a level when pointers only in practice is on
 
 	void updateOT() {
 		for (auto pair = m_fields->OTEntities.begin(); pair != m_fields->OTEntities.end(); ) {
@@ -180,8 +137,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 			updateEntityPosition(entity, target);
 			++pair;
 		}
-	} // the "main" update function
-
+	}
 
 	void updateEntityPosition(CCSprite* entity, GameObject* target) {
 		// wall of stuff
@@ -193,8 +149,9 @@ class $modify(OTPlayLayer, PlayLayer) {
 		CCPoint cam = GJBaseGameLayer::get()->m_gameState.m_cameraPosition;
 		float cameraFlip = GJBaseGameLayer::get()->m_cameraFlip;
 		CCPoint screenPos = ccp((lootPos.x - cam.x) * cameraZoom * cameraFlip, (lootPos.y - cam.y) * cameraZoom);
+		CCPoint clampScreenPos;
 		float distanceSq;
-		float onScreenMargin = 20.f;
+		float onScreenMargin = -5.f;
 		CCPoint distance = ccpSub(cam, lootPos);
 		float minDistance = 1000.f;
 		float maxDistance = 2000.f;
@@ -231,7 +188,6 @@ class $modify(OTPlayLayer, PlayLayer) {
 			distanceSq = distance.x * distance.x + distance.y * distance.y;
 		} // if not platformer, use camera distance for calculations
 
-		// opacity calculation
 		bool onScreen = screenPos.x > onScreenMargin && screenPos.x < winSize.width - onScreenMargin && screenPos.y > onScreenMargin && screenPos.y < winSize.height - onScreenMargin;
 		if (onScreen) {
 			entity->setOpacity(0);
@@ -251,16 +207,18 @@ class $modify(OTPlayLayer, PlayLayer) {
 
 		// clamp entity to screen
 		float margin = 40.f;
-		screenPos.x = std::clamp(screenPos.x, margin, winSize.width - margin);
-		screenPos.y = std::clamp(screenPos.y, margin, winSize.height - margin);
-		entity->setPosition(screenPos);
-
+		clampScreenPos.x = std::clamp(screenPos.x, margin, winSize.width - margin);
+		clampScreenPos.y = std::clamp(screenPos.y, margin, winSize.height - margin);
+		entity->setPosition(clampScreenPos);
+		
 		if (!onScreen) {
 			updateArrowRotation(entity, target);
 			cross->setOpacity(0);
-		} // update arrows if target is offscreen and hide cross
-	} // place entity on screen
-
+		}
+		else {
+		cross->setPosition((screenPos-clampScreenPos) * 2);
+		}
+	}
 
 	void updateArrowRotation(CCSprite* entity, GameObject* target) {
 		auto arrow = entity->getChildByID("arrow");
@@ -284,14 +242,12 @@ class $modify(OTPlayLayer, PlayLayer) {
 		return;
 	} // make arrow point towards the target collectible
 
-
 	void cleanOverThere() {
 		if (auto lootNode = this->m_objectParent->getChildByID("over-there-node")) {
 			lootNode->removeAllChildren();
 		}
 		m_fields->OTEntities.clear();
-	} // second prettiest function in the whole mod
-
+	}
 
 	void setupOverThere() {
 		if (!this->m_objectParent->getChildByID("over-there-node")) {
@@ -299,6 +255,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 			auto lootNode = CCNode::create();
 			lootNode->setID("over-there-node");
 			mainNode->addChild(lootNode, 51);
+			log::info("Setup: Creating Over There CCNode...");
 		} // if node doesn't exist, create it
 		m_fields->OTEntities = std::unordered_map<CCSprite*, GameObject*>();
 		for (int i = 0; i < this->m_collectibles->count(); i++) {
@@ -307,24 +264,48 @@ class $modify(OTPlayLayer, PlayLayer) {
 		} // create entities for all the collectibles in the level
 	} // setup mod
 
-
 	void createOverThereEntity(GameObject* target) {
 		if (target->m_isDisabled) return;
-		if (m_fields->OTEntities.size() == Mod::get()->getSettingValue<int>("pointer-limit")) return;
+		if (m_fields->OTEntities.size() == overthere::settings.pointerLimit) return;
 		auto lootNode = this->m_objectParent->getChildByID("over-there-node");
-		auto otEntity = CCSprite::createWithTexture(target->getTexture(), target->getTextureRect());
-		otEntity->m_bRectRotated = target->isTextureRectRotated();
-		otEntity->setScale(0.6f);
-		otEntity->setAnchorPoint({0.5f, 0.5f});
-		otEntity->setContentSize({50.f, 50.f});
-		otEntity->refreshTextureRect(); // bruh
-		otEntity->setID("over-there-entity");
-		lootNode->addChild(otEntity);
-		m_fields->OTEntities[otEntity] = target;
-		createArrowInstance(otEntity);
-		createCrossInstance(otEntity);
-	} // create entity for the targeted collectible and add it to the map
-
+		if (target->m_objectID == 142) {
+			auto otEntity = CCSprite::createWithTexture(CCTextureCache::sharedTextureCache()->addImage("goldCoin_001.png"_spr, 0));
+			otEntity->setScale(0.6f);
+			otEntity->setAnchorPoint({0.5f, 0.5f});
+			otEntity->setContentSize({50.f, 50.f});
+			otEntity->refreshTextureRect();
+			otEntity->setID("over-there-entity");
+			lootNode->addChild(otEntity);
+			m_fields->OTEntities[otEntity] = target;
+			createArrowInstance(otEntity);
+			createCrossInstance(otEntity);
+		}
+		else if (target->m_objectID == 1329) {
+			auto otEntity = CCSprite::createWithTexture(CCTextureCache::sharedTextureCache()->addImage("silverCoin_001.png"_spr, 0));
+			otEntity->setScale(0.6f);
+			otEntity->setAnchorPoint({0.5f, 0.5f});
+			otEntity->setContentSize({50.f, 50.f});
+			otEntity->refreshTextureRect();
+			otEntity->setID("over-there-entity");
+			lootNode->addChild(otEntity);
+			m_fields->OTEntities[otEntity] = target;
+			createArrowInstance(otEntity);
+			createCrossInstance(otEntity);
+		}
+		else {
+			auto otEntity = CCSprite::createWithTexture(target->getTexture(), target->getTextureRect());
+			otEntity->m_bRectRotated = target->isTextureRectRotated();
+			otEntity->setScale(0.6f);
+			otEntity->setAnchorPoint({0.5f, 0.5f});
+			otEntity->setContentSize({50.f, 50.f});
+			otEntity->refreshTextureRect();
+			otEntity->setID("over-there-entity");
+			lootNode->addChild(otEntity);
+			m_fields->OTEntities[otEntity] = target;
+			createArrowInstance(otEntity);
+			createCrossInstance(otEntity);
+		}
+	}
 
 	void createArrowInstance(CCSprite* entity) {
 		auto arrow = CCSprite::createWithTexture(CCTextureCache::sharedTextureCache()->addImage("arrowRed_001.png"_spr, 0));
@@ -333,7 +314,7 @@ class $modify(OTPlayLayer, PlayLayer) {
 		arrow->setID("arrow");
 		entity->addChild(arrow);
 		arrow->ignoreAnchorPointForPosition(true);
-	} // create arrow child for entity to point with
+	}
 
 	void createCrossInstance(CCSprite* entity) {
 		auto cross = CCSprite::createWithTexture(CCTextureCache::sharedTextureCache()->addImage("crossRed_001.png"_spr, 0));
@@ -344,5 +325,5 @@ class $modify(OTPlayLayer, PlayLayer) {
 		cross->setID("cross");
 		entity->addChild(cross);
 		cross->ignoreAnchorPointForPosition(true);
-	} // create X for marking loot position
+	}
 };

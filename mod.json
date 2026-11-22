@@ -1,14 +1,14 @@
 {
-	"geode": "5.4.1",
+	"geode": "6.0.0-beta.1",
 	"gd": {
-		"win": "2.2081",
-		"android": "2.2081",
-		"mac": "2.2081",
-		"ios": "2.2081"
+		"win": "2.2091",
+		"android": "2.2091",
+		"mac": "2.2091",
+		"ios": "2.2091"
 	},
 	"id": "arram.over-there",
 	"name": "Over There (Coin Finder)",
-	"version": "v1.0.5",
+	"version": "v1.1.0",
 	"developer": "Arram",
 	"description": "The loot is over there",
 	"links": {
@@ -22,30 +22,13 @@
 		"utility"
 	],
 	"dependencies": {
-		"geode.node-ids": ">=v1.22.0"
 	},
 	"settings": {
-		"ot-title":{
-			"type": "title",
-			"name": "Over There Settings"
-		},
-		"practice-pointers": {
-			"type": "bool",
-			"name": "Toggle Pointers Only in Practice Mode",
-			"default": false
-		},
-		"toggle-pointers": {
-			"type": "bool",
-			"name": "Toggle Pointers",
-			"default": true
-		},
-		"pointer-limit": {
-			"type": "int",
-			"name": "Maximum Pointer Count",
-			"default": 24,
-			"description": "Some spam levels use pickup objects in an attempt to lag the game (and it works). This limit will help prevent excessive entity creation. Some levels have quite a few keys, so I've made the maximum limit fairly high, while still allowing for a custom threshold. Hopefully this will be useful for those with weaker devices.",
-			"min": 6,
-			"max": 48
+		"mod-theme": {
+			"type": "string",
+			"name": "Mod Theme",
+			"default": "Brown",
+			"one-of": ["Brown", "Blue", "Green", "Purple", "Gray", "White"]
 		}
 	},
 	"resources": {
