@@ -293,7 +293,8 @@ class $modify(OTPlayLayer, PlayLayer) {
 			createCrossInstance(otEntity);
 		}
 		else {
-			auto otEntity = CCSprite::createWithTexture(target->getTexture(), target->getTextureRect());
+			auto otEntity = CCSprite::createWithTexture(target->getTexture()/*, target->getTextureRect()*/);
+			otEntity->m_obRect = target->getTextureRect();
 			otEntity->m_bRectRotated = target->isTextureRectRotated();
 			otEntity->setScale(0.6f);
 			otEntity->setAnchorPoint({0.5f, 0.5f});
